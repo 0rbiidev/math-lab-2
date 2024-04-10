@@ -18,4 +18,20 @@ for j in (n1 for n1 in range(1, 600) if n1%dt == 0):
         A[y][y] = 1+r
         A[y][y+1] = -r/2
 
-        b[]
+        b[y] = (r/2)*grid[x][y-1] + (1-r)*grid[x][y] + (r/2)*grid[x][y+1]
+
+        y++
+
+    # Thomas algorithm for trilinear matrix
+
+    for i in range(1,len(A)): #decompose
+        A[i][i-1] /= A[i-1][i-1]
+        A[i][i] -= A[i][i-1] * A[i][i+1] 
+
+    for i in range(1,len(A)): #fwd sub
+        b[i] -= A[i][i] * b[i-1]
+    
+    # bwd sub
+    
+
+    x++
