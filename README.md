@@ -1,0 +1,1 @@
+Simple Partial Differential Equation solver programs exploring implicit and explicit methods implemented in Python. Written for University coursework to model the cooling over time of a 500C uniform aluminium rod with each end set to 0C.
