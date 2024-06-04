@@ -1,37 +1,37 @@
-dx, dt = (20,100)
-grid = ([[0.0 for i in range(100//dx + 1)] for j in range(600//dt + 1)])
-grid[0] = [0.0] + [500]*(100//dx - 1) + [0.0]
-r = (0.875 * dt) / (2 * dx**2)
-b = [0.0 for i in range (100//dx)]
-A = ([[0.0 for i in range(100//dx)] for j in range(100//dx)])
+dx, dt = (20,50)
+r = (0.875*dt) / (dx**2)
 
-x = 1
+nLensamples = 100//dx - 1
+nTimesamples = 600//dt + 1
 
-for j in (n1 for n1 in range(1, 600) if n1%dt == 0):
-    y = 1
-    A[0][0] = 1+r
-    A[0][1] = -(r/2)
-    b[0] = 0
+s = ([0.0 for i in range(nLensamples+2)])
 
-    for i in (n2 for n2 in range(1, 100) if n2%dx == 0):
-        A[y][y-1] = -r/2
-        A[y][y] = 1+r
-        A[y][y+1] = -r/2
+a = [0.0, 0.0] + [-r/2]*(nLensamples-1) + [0.0]
+b = [0.0] + [1+r]*nLensamples + [0.0]
+y = [0.0] + [-r/2]*(nLensamples-1) + [0.0, 0.0]
 
-        b[y] = (r/2)*grid[x][y-1] + (1-r)*grid[x][y] + (r/2)*grid[x][y+1]
+#1 - Decomposition
 
-        y++
+for i in range(2, nLensamples+1):
+    a[i] = a[i] / b[i-1]
+    b[i] = b[i] - a[i]*y[i-1]
 
-    # Thomas algorithm for trilinear matrix
+x = [0.0] + [500.0]*nLensamples + [0.0] #boundary condition
 
-    for i in range(1,len(A)): #decompose
-        A[i][i-1] /= A[i-1][i-1]
-        A[i][i] -= A[i][i-1] * A[i][i+1] 
+print(x)
 
-    for i in range(1,len(A)): #fwd sub
-        b[i] -= A[i][i] * b[i-1]
-    
-    # bwd sub
-    
+for t in range(1, nTimesamples):
+    for i in range(1, nLensamples+1): 
+        s[i] = (r/2)*x[i-1] + (1-r)*x[i] + (r/2)*x[i+1] # evaluate known values
 
-    x++
+    #2 - Fwd Sub
+    for i in range(2, nLensamples+1):
+        s[i] -= a[i]*s[i-1]
+
+    #3 - Bwd Sub
+    x[nLensamples] = s[nLensamples] / b[nLensamples]
+
+    for i in range(nLensamples-1, 0, -1):
+        x[i] = (s[i] - y[i]*x[i+1]) / b[i]
+
+    print(x[1])
